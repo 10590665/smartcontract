@@ -6,76 +6,38 @@ from web3.auto import w3
 from web3.providers.websocket import WebsocketProvider
 from web3 import Web3
 from solc import compile_standard
-
 with open("Greeter.sol") as c:
  contractText=c.read()
 with open(".pk") as pkfile:
  privateKey=pkfile.read()
 with open(".infura") as infurafile:
  infuraKey=infurafile.read()
-
-compiled_sol = compile_standard(contractText)
-
-"language": "Solidity",
- "sources": {
-  "Greeter.sol": {
-   "content": contractText
-  }
- },
- "settings":
- {
-  "outputSelection": {
-   "*": {
-    "*": [
-     "metadata", "evm.bytecode"
-     , "evm.bytecode.sourceMap"
-    ]
-   }
-  }
- }
-})
+# Solidity source code
+compiled_sol = compile_standard({
+     "language": "Solidity",
+     "sources": {
+         "Greeter.sol": {
+             "content": contractText
+         }
+     },
+     "settings":
+         {
+             "outputSelection": {
+                 "*": {
+                     "*": [
+                         "metadata", "evm.bytecode"
+                         , "evm.bytecode.sourceMap"
+                     ]
+                 }
+             }
+         }
+ })
 bytecode = compiled_sol['contracts']['Greeter.sol']['Greeter']['evm']['bytecode']['object']
 abi = json.loads(compiled_sol['contracts']['Greeter.sol']['Greeter']['metadata'])['output']['abi']
 W3 = Web3(WebsocketProvider('wss://ropsten.infura.io/ws/v3/%s'%infuraKey))
 account1=Account.from_key(privateKey);
 address1=account1.address
 Greeter = W3.eth.contract(abi=abi, bytecode=bytecode)
-
-nonce = W3.eth.getTransactionCount(address1)
-#diagnostics
-#print(nonce)
-# Submit the transaction that deploys the contract
-tx_dict = Greeter.constructor().buildTransaction({
-'chainId': 3,
-'gas': 1400000,
-'gasPrice': w3.toWei('40', 'gwei'),
-'nonce': nonce,
-'from':address1
-}) "language": "Solidity",
- "sources": {
-  "Greeter.sol": {
-   "content": contractText
-  }
- },
- "settings":
- {
-  "outputSelection": {
-   "*": {
-    "*": [
-     "metadata", "evm.bytecode"
-     , "evm.bytecode.sourceMap"
-    ]
-   }
-  }
- }
-})
-bytecode = compiled_sol['contracts']['Greeter.sol']['Greeter']['evm']['bytecode']['object']
-abi = json.loads(compiled_sol['contracts']['Greeter.sol']['Greeter']['metadata'])['output']['abi']
-W3 = Web3(WebsocketProvider('wss://ropsten.infura.io/ws/v3/%s'%infuraKey))
-account1=Account.from_key(privateKey);
-address1=account1.address
-Greeter = W3.eth.contract(abi=abi, bytecode=bytecode)
-
 nonce = W3.eth.getTransactionCount(address1)
 #diagnostics
 #print(nonce)
@@ -87,7 +49,6 @@ tx_dict = Greeter.constructor().buildTransaction({
 'nonce': nonce,
 'from':address1
 })
-
 signed_txn = W3.eth.account.sign_transaction(tx_dict, private_key=privateKey)
 #diagnostics
 #print(signed_txn)
@@ -104,19 +65,17 @@ while tx_receipt is None and (count < 300):
   try:
     tx_receipt = W3.eth.getTransactionReceipt(result)
   except:
-    print('.')
+    print('.',end='')
 
 if tx_receipt is None:
   print (" {'status': 'failed', 'error': 'timeout'} ")
 #diagnostics
 #print (tx_receipt)
-print("Contract address is:",tx_receipt.contractAddress)
+print("\nContract address is:",tx_receipt.contractAddress)
 
 greeter = W3.eth.contract(
   address=tx_receipt.contractAddress,
   abi=abi
 )
-
-
 print("Output from greet()")
 print(greeter.functions.greet().call())
