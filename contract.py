@@ -16,34 +16,74 @@ infuraKey=infurafile.read()
 
 compiled_sol = compile_standard(contractText)
 
-web3.py instance
-w3 = Web3(Web3.EthereumTesterProvider())
-
-set pre-funded account as sender
-w3.eth.default_account = w3.eth.accounts[0]
-
-get bytecode
+ "language": "Solidity",
+ "sources": {
+  "Greeter.sol": {
+   "content": contractText
+  }
+ },
+ "settings":
+ {
+  "outputSelection": {
+   "*": {
+    "*": [
+     "metadata", "evm.bytecode"
+     , "evm.bytecode.sourceMap"
+    ]
+   }
+  }
+ }
+})
 bytecode = compiled_sol['contracts']['Greeter.sol']['Greeter']['evm']['bytecode']['object']
-
-get abi
 abi = json.loads(compiled_sol['contracts']['Greeter.sol']['Greeter']['metadata'])['output']['abi']
+W3 = Web3(WebsocketProvider('wss://ropsten.infura.io/ws/v3/%s'%infuraKey))
+account1=Account.from_key(privateKey);
+address1=account1.address
+Greeter = W3.eth.contract(abi=abi, bytecode=bytecode)
 
-Greeter = w3.eth.contract(abi=abi, bytecode=bytecode)
+nonce = W3.eth.getTransactionCount(address1)
+#diagnostics
+#print(nonce)
+# Submit the transaction that deploys the contract
+tx_dict = Greeter.constructor().buildTransaction({
+'chainId': 3,
+'gas': 1400000,
+'gasPrice': w3.toWei('40', 'gwei'),
+'nonce': nonce,
+'from':address1
+}) "language": "Solidity",
+ "sources": {
+  "Greeter.sol": {
+   "content": contractText
+  }
+ },
+ "settings":
+ {
+  "outputSelection": {
+   "*": {
+    "*": [
+     "metadata", "evm.bytecode"
+     , "evm.bytecode.sourceMap"
+    ]
+   }
+  }
+ }
+})
+bytecode = compiled_sol['contracts']['Greeter.sol']['Greeter']['evm']['bytecode']['object']
+abi = json.loads(compiled_sol['contracts']['Greeter.sol']['Greeter']['metadata'])['output']['abi']
+W3 = Web3(WebsocketProvider('wss://ropsten.infura.io/ws/v3/%s'%infuraKey))
+account1=Account.from_key(privateKey);
+address1=account1.address
+Greeter = W3.eth.contract(abi=abi, bytecode=bytecode)
 
-Submit the transaction that deploys the contract
-tx_hash = Greeter.constructor().transact()
-
-Wait for the transaction to be mined, and get the transaction receipt
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-greeter = w3.eth.contract(
-address=tx_receipt.contractAddress,
-abi=abi)
-
-greeter.functions.greet().call()
-'Hello'
-
-tx_hash = greeter.functions.setGreeting('Nihao').transact()
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-greeter.functions.greet().call()
-'Nihao'
+nonce = W3.eth.getTransactionCount(address1)
+#diagnostics
+#print(nonce)
+# Submit the transaction that deploys the contract
+tx_dict = Greeter.constructor().buildTransaction({
+'chainId': 3,
+'gas': 1400000,
+'gasPrice': w3.toWei('40', 'gwei'),
+'nonce': nonce,
+'from':address1
+})
