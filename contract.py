@@ -16,7 +16,7 @@ with open(".infura") as infurafile:
 
 compiled_sol = compile_standard(contractText)
 
- "language": "Solidity",
+"language": "Solidity",
  "sources": {
   "Greeter.sol": {
    "content": contractText
